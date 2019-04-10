@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Angularjs,初始化指令</title>
+    <!--引入angularJS-->
+    <script type="text/javascript" src="../plugins/angularjs/angular.min.js"></script>
+    <script>
+        /*定义自己的moudle*/
+        /*module的名称和依赖的模块*/
+        var myModule=angular.module("myModule",[]);
+        myModule.controller("myController",function($scope){
+            /*模块中的控制器实现了什么功能*/
+            $scope.username="张三";
+        })
+    </script>
+</head>
+<!--ng-app表示这个标签之内的东西是angularjs的model-->
+<body ng-app="myModule" ng-controller="myController" ng-init="username='李四'">
+    用户名:<input type="text" ng-model="username"><br>
+    用户名-->{{username}}
+</body>
+</html>

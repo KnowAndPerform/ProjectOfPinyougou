@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+		xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/security
+						http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<!-- 以下静态资源不被拦截 -->
+	<!--/** 当前目录及其子目录文件资源-->
+	<http pattern="/css/**" security="none"></http>
+	<http pattern="/img/**" security="none"></http>
+	<http pattern="/js/**" security="none"></http>
+	<http pattern="/plugins/**" security="none"></http>
+	<http pattern="/login.html" security="none"></http>
+
+	<!-- 资源拦截规则 use-expressions是否使用SPEL表达式-->
+	<http use-expressions="false">
+		<!--配置拦截规则 -->
+		<intercept-url pattern="/**" access="ROLE_ADMIN" />
+		<form-login
+		     login-page="/login.html"
+		     default-target-url="/admin/index.html"
+			 authentication-failure-url="/login.html"
+			 always-use-default-target="true"
+			  />
+
+		<!--always-use-default-target="true" 登录成功后，一直跳转默认访问页面
+			login-processing-url="/login" 安全框架登录地址配置
+		-->
+
+		<!--csrf 跨域请求伪造安全机制-->
+		<csrf disabled="true" />
+		
+		<!-- iframe加载策略 -->
+		<headers>
+			<!--iframe加载策略 默认是DENY,拒绝加载iframe资源
+				SAMEORIGIN:同源策略可以访问
+			-->
+			<frame-options policy="SAMEORIGIN" />
+		</headers>
+
+		<!--退出系统-->
+		<logout />
+	</http>
+	
+	<!-- 认证管理器 -->
+	<authentication-manager>
+		<authentication-provider>
+			<user-service>
+				<!--authorities 当前用户具有的角色列表-->
+				<user name="admin" password="123456" authorities="ROLE_ADMIN" />
+				<user name="sunwukong" password="dasheng" authorities="ROLE_ADMIN" />
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+</beans:beans>

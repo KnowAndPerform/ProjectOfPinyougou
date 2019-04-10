@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>angular入门demo之内置服务</title>
+
+    <!--引入angular资源-->
+    <script type="text/javascript" src="../plugins/angularjs/angular.min.js"></script>
+    <script type="text/javascript">
+        //自定义模块
+        //参数一：模块名称 参数二：依赖的其他模块，可以依赖多个模块
+        //如果没有依赖其他模块，也需要声明空数组[]
+        var app =angular.module("myapp",[]);
+        //定义控制器，为name模型数据赋值
+        //参数一：控制器名称 参数二：控制器要处理的事情
+        //$scope可以理解为全局的作用域对象  作用：相当于js代码与html代码数据交互的桥梁
+        //$http内置服务，作用：发起http请求 注意：发起的全部都是异步请求（ajax）
+        app.controller("myctrl",function ($scope,$http) {
+
+            //查询所有品牌列表的方法
+            $scope.findAll=function () {
+                //参数：请求地址  success请求成功后回调函数  response接收响应结果
+                $http.get("../brand/findAll.do").success(function (response) {
+                    $scope.list=response;
+                })
+            }
+        });
+
+    </script>
+
+
+</head>
+<!--在使用angular表达式或者相关指令时，需要先声明模块 ，模块作用：定义angular作用范围-->
+<!--ng-app：声明模块的指令-->
+<!--ng-controller：声明控制器指令-->
+<body ng-app="myapp" ng-controller="myctrl" ng-init="findAll()">
+    <!--<table>
+        <tr ng-repeat="x in list">
+            <td>{{x}}</td>
+        </tr>
+    </table>-->
+
+    <table>
+        <tr>
+            <th>编号</th>
+            <th>品牌名称</th>
+            <th>品牌首字母</th>
+        </tr>
+        <!--ng-repeat 循环遍历指令-->
+        <tr ng-repeat="brand in list">
+            <td>{{brand.id}}</td>
+            <td>{{brand.name}}</td>
+            <td>{{brand.firstChar}}</td>
+        </tr>
+    </table>
+
+</body>
+</html>

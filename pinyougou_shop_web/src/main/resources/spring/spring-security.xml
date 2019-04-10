@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+        xmlns="http://www.springframework.org/schema/security"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/security
+						http://www.springframework.org/schema/security/spring-security.xsd http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 以下静态资源不被拦截 -->
+    <!--/** 当前目录及其子目录文件资源-->
+    <http pattern="/css/**" security="none"></http>
+    <http pattern="/img/**" security="none"></http>
+    <http pattern="/js/**" security="none"></http>
+    <http pattern="/plugins/**" security="none"></http>
+    <!--注册页面不拦截,add也不能拦截-->
+    <http pattern="/register.html" security="none"></http>
+    <http pattern="/seller/add.do" security="none"></http>
+    <http pattern="/shoplogin.html" security="none"></http>
+
+    <!-- 资源拦截规则 use-expressions是否使用SPEL表达式-->
+    <http use-expressions="false">
+        <!--配置拦截规则 -->
+        <intercept-url pattern="/**" access="ROLE_SELLER"/>
+        <form-login
+                login-page="/shoplogin.html"
+                default-target-url="/admin/index.html"
+                authentication-failure-url="/shoplogin.html"
+                always-use-default-target="true"
+        />
+
+        <!--always-use-default-target="true" 登录成功后，一直跳转默认访问页面
+            login-processing-url="/login" 安全框架登录地址配置
+        -->
+
+        <!--csrf 跨域请求伪造安全机制-->
+        <csrf disabled="true"/>
+
+        <!-- iframe加载策略 -->
+        <headers>
+            <!--iframe加载策略 默认是DENY,拒绝加载iframe资源
+                SAMEORIGIN:同源策略可以访问
+            -->
+            <frame-options policy="SAMEORIGIN"/>
+        </headers>
+
+        <!--退出系统-->
+        <logout/>
+    </http>
+    <!-- 认证管理器 -->
+    <authentication-manager>
+        <!--用自己的认证提供者,就是一个自己的认证service-->
+        <authentication-provider user-service-ref="userDetailsService">
+            <!--认证password-->
+            <password-encoder ref="passwordEncoder"></password-encoder>
+        </authentication-provider>
+    </authentication-manager>
+    <!--自定义认证服务类:service定义在web层级就可以,不然还得再service层添加所有的spring-security配置-->
+    <beans:bean id="userDetailsService" class="com.pinyougou.user.service.UserDetailsServiceImpl">
+        <!--类中的属性:name 属性的名称  ref 属性的注入-->
+        <beans:property name="sellerService" ref="sellerService"></beans:property>
+    </beans:bean>
+    <!--web层去引用dubbo  dubbo去注册中心寻找服务-->
+    <dubbo:application name="pinyougou_shop_web"/>
+    <!--注册中心的地址?-->
+    <dubbo:registry address="zookeeper://192.168.25.128:2181"/>
+    <!--	controller层的注解:
+        <dubbo:annotation package="com.pinyougou.manager.controller"/>-->
+    <dubbo:reference id="sellerService" interface="com.pinyougou.sellergoods.service.SellerService"/>
+
+
+    <!--指定登陆的时候的加密对象:-->
+    <beans:bean id="passwordEncoder"
+                class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></beans:bean>
+</beans:beans>

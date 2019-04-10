@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>循环数组</title>
+</head>
+<script type="text/javascript" src="../plugins/angularjs/angular.min.js"></script>
+<script>
+    var myModule=angular.module("myModule",[]);
+    myModule.controller("myController",function($scope,$http){
+        //json格式的数据,[]代表数组,{}对象
+        //$scope.list=[100,200,300];
+        /*$scope.list=[
+            {name:"z",math:100,yuwen:200},
+            {name:"y",math:100,yuwen:20},
+            {name:"x",math:10,yuwen:20}
+        ];*/
+        $scope.findAll=function(){
+            $http.get("../brand/findAll.do").success(function(response){
+                $scope.list=response;
+            });
+        }
+
+
+    })
+</script>
+<body ng-app="myModule" ng-controller="myController" ng-init="findAll()">
+    <table>
+        <tr>
+            <th>姓名</th>
+            <th>数学</th>
+            <th>语文</th>
+        </tr>
+        <tr ng-repeat="stu in list">
+            <td>{{stu.id}}</td>
+            <td>{{stu.name}}</td>
+            <td>{{stu.firstChar}}</td>
+        </tr>
+    </table>
+<!--    <table>
+        <tr ng-repeat="x in list">
+            <td>{{x}}</td>
+        </tr>
+    </table>-->
+
+</body>
+</html>
